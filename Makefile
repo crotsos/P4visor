@@ -111,6 +111,7 @@ install:
 	curl -fsSL https://download.opensuse.org/repositories/home:p4lang/xUbuntu_${DISTRIB_RELEASE}/Release.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/home_p4lang.gpg > /dev/null
 	sudo apt-get update
 	sudo apt install p4lang-p4c
+	pip3  install protobuf==3.20.*
 
 p4-build: p4src/main.p4
 	$(info *** Building P4 program...)
@@ -121,4 +122,5 @@ p4-build: p4src/main.p4
 		p4src/main.p4
 	@echo "*** P4 program compiled successfully! Output files are in p4src/build"
 
-
+build-proto: 
+	/usr/bin/protoc  --experimental_allow_proto3_optional proto/p4/v1/p4data.proto proto/p4/v1/p4runtime.proto proto/p4/config/v1/p4info.proto proto/p4/config/v1/p4types.proto proto/google/rpc/status.proto proto/google/rpc/code.proto proto/p4/tmp/p4config.proto proto/p4/server/v1/config.proto  --python_out=./ -Iproto
