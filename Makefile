@@ -111,7 +111,7 @@ install:
 	curl -fsSL https://download.opensuse.org/repositories/home:p4lang/xUbuntu_${DISTRIB_RELEASE}/Release.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/home_p4lang.gpg > /dev/null
 	sudo apt-get update
 	sudo apt install p4lang-p4c
-	pip3  install protobuf==3.20.*
+	pip3  install grpcio grpcio-tools
 
 p4-build: p4src/main.p4
 	$(info *** Building P4 program...)
