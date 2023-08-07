@@ -123,4 +123,4 @@ p4-build: p4src/main.p4
 	@echo "*** P4 program compiled successfully! Output files are in p4src/build"
 
 build-proto: 
-	/usr/bin/protoc  --experimental_allow_proto3_optional proto/p4/v1/p4data.proto proto/p4/v1/p4runtime.proto proto/p4/config/v1/p4info.proto proto/p4/config/v1/p4types.proto proto/google/rpc/status.proto proto/google/rpc/code.proto proto/p4/tmp/p4config.proto proto/p4/server/v1/config.proto  --python_out=./ -Iproto
+	python3 -m grpc_tools.protoc --proto_path=proto proto/p4/v1/p4data.proto proto/p4/config/v1/p4info.proto proto/p4/config/v1/p4types.proto proto/google/rpc/status.proto proto/google/rpc/code.proto proto/p4/tmp/p4config.proto proto/p4/server/v1/config.proto proto/p4/v1/p4runtime.proto --python_out=. --grpc_python_out=.
