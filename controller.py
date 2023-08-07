@@ -20,13 +20,13 @@ import helper
 
 
 def writeIpv4Rules(p4info_helper, sw_id, dst_ip_addr, port):
-     table_entry = p4info_helper.buildTableEntry(
-         table_name="MyIngress.ipv4_lpm",
-         match_fields={"hdr.ipv4.dstAddr": (dst_ip_addr, 32)},
-         action_name="MyIngress.ipv4_forward",
-         action_params={"port": port},
-     )
-     sw_id.WriteTableEntry(table_entry)
+    table_entry = p4info_helper.buildTableEntry(
+            table_name="MyIngress.ipv4_lpm",
+            match_fields={"hdr.ipv4.dstAddr": (dst_ip_addr, 32)},
+            action_name="MyIngress.ipv4_forward",
+            action_params={"port": port},
+            )
+    sw_id.WriteTableEntry(table_entry)
     print("Installed ingress forwarding rule on %s" % sw_id.name)
 
 
