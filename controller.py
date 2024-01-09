@@ -74,12 +74,12 @@ def main(p4info_file_path, bmv2_file_path):
     p4info_helper = helper.P4InfoHelper(p4info_file_path)
 
     try:
-        # Create a switch connection object for s1 and s2;
+        # Create a switch connection object for s1;
         # this is backed by a P4Runtime gRPC connection.
         # Also, dump all P4Runtime messages sent to switch to given txt files.
         s1 = bmv2.Bmv2SwitchConnection(
             name="s0",
-            address="172.18.0.1:50001",
+            address="127.0.0.1:61001",
             device_id=1,
             proto_dump_file="p4runtime.log",
         )
@@ -91,6 +91,7 @@ def main(p4info_file_path, bmv2_file_path):
             print("Failed to establish the connection")
 
         # Install the P4 program on the switches
+        print("so far")
         s1.SetForwardingPipelineConfig(
             p4info=p4info_helper.p4info, bmv2_json_file_path=bmv2_file_path
         )
@@ -107,7 +108,7 @@ def main(p4info_file_path, bmv2_file_path):
             packetin = s1.PacketIn()  # Packet in!
             if packetin is not None:
                 print("PACKET IN received")
-                print(packetin)
+                #print(packetin)
                 packet = packetin.packet.payload
                 packetout = p4info_helper.buildPacketOut(
                     payload=packet,  # send the packet in you received back to output port 3!

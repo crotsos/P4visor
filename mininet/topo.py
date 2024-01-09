@@ -110,7 +110,7 @@ class TutorialTopo(Topo):
         h2 = self.addHost('h2', cls=TaggedIPv4Host, mac="00:00:00:00:00:20",
                           ip='172.16.1.4/24', gw='172.16.1.254')
         self.addLink(h1a, leaf1)  # port 1
-        sef.addLink(h1b, leaf1)  # port 2
+        self.addLink(h1b, leaf1)  # port 2
         self.addLink(h1c, leaf1)  # port 3
         self.addLink(h2, leaf1)  # port 4
 
