@@ -13,20 +13,69 @@ import helper
 from concurrent import futures
 from google.protobuf import empty_pb2
 
+def writeIpv4Rules(p4info_helper, sw_id, dst_ip_addr, port):
+    table_entry = p4info_helper.buildTableEntry(
+            table_name="MyIngress.ipv4_lpm",
+            match_fields={"hdr.ipv4.dstAddr": (dst_ip_addr, 32)},
+            action_name="MyIngress.ipv4_forward",
+            action_params={"port": port},
+            )
+    sw_id.WriteTableEntry(table_entry)
+    print("Installed ingress forwarding rule on %s" % sw_id.name)
+
+def readTableRules(p4info_helper, sw):
+    """
+    Reads the table entries from all tables on the switch.
+
+    :param p4info_helper: the P4Info helper
+    :param sw: the switch connection
+    """
+    print("\n----- Reading tables rules for %s -----" % sw.name)
+    for response in sw.ReadTableEntries():
+        for entity in response.entities:
+            entry = entity.table_entry
+            table_name = p4info_helper.get_tables_name(entry.table_id)
+            print("%s: " % table_name, end="")
+            for m in entry.match:
+                print(
+                    p4info_helper.get_match_field_name(table_name, m.field_id), end=""
+                )
+                print("%r" % (p4info_helper.get_match_field_value(m),), end="")
+            action = entry.action.action
+            action_name = p4info_helper.get_actions_name(action.action_id)
+            print("-> action:%s with parameters:" % action_name, end="")
+            for p in action.params:
+                print(
+                    " %s"
+                    % p4info_helper.get_action_param_name(action_name, p.param_id),
+                    end="",
+                )
+                print(" %r" % p.value, end="")
+            print("")
+
 class p4VisorToSwitch(p4runtime_pb2_grpc.P4RuntimeServicer):
     def __init__(self, switch, p4InfoFilePath, bmv2FilePath):
         #self.controller_channel = grpc.insecure_channel("0.0.0.0:61001")
         #self.controller_stub = p4runtime_pb2_grpc.P4RuntimeStub(self.controller_channel)
         #self.s1 = bmv2.Bmv2SwitchConnection(name="s1", address="172.18.0.2:50001",device_id=1)
         self.s1 = switch
-        #self.p4InfoFilePath = p4InfoFilePath
-        #self.bmv2FilePath = bmv2FilePath
+        self.masterArbitrationResult = self.s1.MasterArbitrationUpdate()
+        print("THIS THIS THIS")
+        print(self.masterArbitrationResult)
+        print("THAT THAT THAT")
+        p4info_helper = helper.P4InfoHelper(p4InfoFilePath)
+        setForwardingResult = self.s1.SetForwardingPipelineConfig(
+            p4info=p4info_helper.p4info, bmv2_json_file_path=bmv2FilePath) #returns "None" but I think that's fine
+        writeIpv4Rules(p4info_helper, sw_id=self.s1, dst_ip_addr="172.16.1.1", port=255)
+        writeIpv4Rules(p4info_helper, sw_id=self.s1, dst_ip_addr="172.16.1.2", port=255)
+        writeIpv4Rules(p4info_helper, sw_id=self.s1, dst_ip_addr="172.16.1.3", port=255)
+        writeIpv4Rules(p4info_helper, sw_id=self.s1, dst_ip_addr="172.16.1.4", port=255)
+        # read all table rules
+        readTableRules(p4info_helper, self.s1)
+
 
     def MasterArbitrationUpdate(self, request, context):
-        response = self.s1.MasterArbitrationUpdate(request)
-        print("Now printing the MAU response")
-        print(response)
-        return response
+        return self.masterArbitrationResult
     
     def SetForwardingPipelineConfig(self, request, context):
         #print(request)

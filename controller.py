@@ -86,8 +86,9 @@ def main(p4info_file_path, bmv2_file_path):
 
         # Send master arbitration update message to establish this controller as
         # master (required by P4Runtime before performing any other write operation)
-
-        if s1.MasterArbitrationUpdate() == None:
+        MasterArbitrationUpdate = s1.MasterArbitrationUpdate()
+        print(MasterArbitrationUpdate)
+        if MasterArbitrationUpdate == None:
             print("Failed to establish the connection")
 
         # Install the P4 program on the switches
