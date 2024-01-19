@@ -93,18 +93,23 @@ def main(p4info_file_path, bmv2_file_path):
 
         # Install the P4 program on the switches
         print("so far")
-        s1.SetForwardingPipelineConfig(
-            p4info=p4info_helper.p4info, bmv2_json_file_path=bmv2_file_path
-        )
-        print("Installed P4 Program using SetForwardingPipelineConfig on s1")
-
-        # Forward all packet to the controller (CPU_PORT 255)
+        try:
+            s1.SetForwardingPipelineConfig(
+                p4info=p4info_helper.p4info, bmv2_json_file_path=bmv2_file_path
+            )
+            print("Installed P4 Program using SetForwardingPipelineConfig on s1")
+        except Exception as e:
+            print("Forwarding Pipeline added.")
+            print(e)
+            # Forward all packet to the controller (CPU_PORT 255)
         writeIpv4Rules(p4info_helper, sw_id=s1, dst_ip_addr="172.16.1.1", port=255)
         writeIpv4Rules(p4info_helper, sw_id=s1, dst_ip_addr="172.16.1.2", port=255)
         writeIpv4Rules(p4info_helper, sw_id=s1, dst_ip_addr="172.16.1.3", port=255)
         writeIpv4Rules(p4info_helper, sw_id=s1, dst_ip_addr="172.16.1.4", port=255)
         # read all table rules
         readTableRules(p4info_helper, s1)
+        print("Finished reading.")
+
         while True:
             packetin = s1.PacketIn()  # Packet in!
             if packetin is not None:
